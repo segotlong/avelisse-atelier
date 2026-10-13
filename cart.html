@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Bag | Avelisse Atelier</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .cart-page {
+            max-width: 950px;
+            margin: auto;
+            padding: 45px 24px 80px;
+            color: #49372d;
+        }
+
+        .cart-page h1 {
+            font-family: Georgia, serif;
+            font-size: 38px;
+            font-weight: 400;
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            gap: 20px;
+            align-items: center;
+            padding: 22px 0;
+            border-bottom: 1px solid #e2d5c7;
+        }
+
+        .cart-item img {
+            width: 100px;
+            height: 110px;
+            object-fit: cover;
+        }
+
+        .cart-item h2 {
+            font-family: Georgia, serif;
+            font-size: 22px;
+            font-weight: 400;
+        }
+
+        .cart-item button {
+            background: transparent;
+            border: 1px solid #d9cabc;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .cart-total {
+            margin-top: 30px;
+            text-align: right;
+            font-size: 20px;
+        }
+
+        .checkout-link {
+            display: block;
+            width: fit-content;
+            margin: 20px 0 12px auto;
+            padding: 14px 22px;
+            background: #302a26;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 1.5px;
+            font-size: 12px;
+        }
+
+        .checkout-link:hover {
+            opacity: .88;
+        }
+
+        .cart-empty a,
+        .continue-shopping {
+            color: #49372d;
+        }
+
+        @media (max-width: 550px) {
+            .cart-item {
+                grid-template-columns: 75px 1fr;
+                gap: 12px;
+            }
+
+            .cart-item img {
+                width: 75px;
+                height: 90px;
+            }
+
+            .cart-item .item-price {
+                grid-column: 2;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="cart-page">
+        <a class="continue-shopping" href="candles.html">
+            ← Continue shopping
+        </a>
+
+        <h1>Your bag.</h1>
+        <p>Your chosen candles, gathered in one place.</p>
+
+        <div id="cartItems"></div>
+
+        <div id="cartSummary" hidden>
+            <div class="cart-total">
+                Subtotal: <strong id="cartTotal">R 0</strong>
+            </div>
+            <p>
+                Delivery and final order details will be confirmed
+                when you place your order.
+            </p>
+            <a class="checkout-link" href="checkout.html">CONTINUE TO CHECKOUT →</a>
+            <button id="clearCart" type="button">Clear bag</button>
+        </div>
+    </main>
+
+    <script>
+        const cartItems = document.getElementById("cartItems");
+        const cartSummary = document.getElementById("cartSummary");
+        const cartTotal = document.getElementById("cartTotal");
+
+        function getCart() {
+            try {
+                return JSON.parse(
+                    localStorage.getItem("avelisseCart") || "[]"
+                );
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function renderCart() {
+            const cart = getCart();
+            cartItems.innerHTML = "";
+
+            if (cart.length === 0) {
+                cartSummary.hidden = true;
+                cartItems.innerHTML =
+                    '<div class="cart-empty"><p>Your bag is empty.</p>' +
+                    '<a href="candles.html">Explore our candles →</a></div>';
+                return;
+            }
+
+            let total = 0;
+
+            cart.forEach(function (item, index) {
+                const price = Number(item.price) || 0;
+                const quantity = Number(item.quantity) || 1;
+                total += price * quantity;
+
+                const row = document.createElement("div");
+                row.className = "cart-item";
+
+                const image = document.createElement("img");
+                image.src = item.image;
+                image.alt = item.name;
+
+                const details = document.createElement("div");
+                const name = document.createElement("h2");
+                name.textContent = item.name;
+
+                const quantityText = document.createElement("p");
+                quantityText.textContent = "Quantity: " + quantity;
+
+                const controls = document.createElement("div");
+
+                const minus = document.createElement("button");
+                minus.textContent = "−";
+                minus.setAttribute("aria-label", "Decrease quantity");
+
+                minus.addEventListener("click", function () {
+                    const updated = getCart();
+                    updated[index].quantity--;
+
+                    if (updated[index].quantity <= 0) {
+                        updated.splice(index, 1);
+                    }
+
+                    localStorage.setItem(
+                        "avelisseCart",
+                        JSON.stringify(updated)
+                    );
+                    renderCart();
+                });
+
+                const plus = document.createElement("button");
+                plus.textContent = "+";
+                plus.setAttribute("aria-label", "Increase quantity");
+
+                plus.addEventListener("click", function () {
+                    const updated = getCart();
+                    updated[index].quantity++;
+
+                    localStorage.setItem(
+                        "avelisseCart",
+                        JSON.stringify(updated)
+                    );
+                    renderCart();
+                });
+
+                controls.append(minus, plus);
+                details.append(name, quantityText, controls);
+
+                const itemPrice = document.createElement("strong");
+                itemPrice.className = "item-price";
+                itemPrice.textContent =
+                    "R " + (price * quantity).toFixed(2).replace(".00", "");
+
+                row.append(image, details, itemPrice);
+                cartItems.appendChild(row);
+            });
+
+            cartTotal.textContent =
+                "R " + total.toFixed(2).replace(".00", "");
+            cartSummary.hidden = false;
+        }
+
+        document.getElementById("clearCart").addEventListener(
+            "click",
+            function () {
+                localStorage.removeItem("avelisseCart");
+                renderCart();
+            }
+        );
+
+        renderCart();
+    </script>
+</body>
+</html>
