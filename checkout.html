@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Avelisse Atelier</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #fbf6ef;
+            color: #302a26;
+            font-family: Montserrat, Arial, sans-serif;
+        }
+        * { box-sizing: border-box; }
+        .checkout-wrap { max-width: 1180px; margin: 0 auto; padding: 24px 28px 80px; }
+        .checkout-steps { max-width: 900px; margin: 0 auto 78px; display: grid; grid-template-columns: repeat(4, 1fr); }
+        .checkout-step { position: relative; text-align: center; color: #776b61; font-size: 11px; letter-spacing: 2px; }
+        .checkout-step:not(:last-child)::after { content: ""; position: absolute; top: 28px; left: 60%; width: 80%; height: 1px; background: #dfd2c5; z-index: 0; }
+        .step-circle { width: 58px; height: 58px; border: 1px solid #dfd2c5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; background: #fbf6ef; font-size: 14px; letter-spacing: 0; position: relative; z-index: 1; }
+        .checkout-step.active { color: #302a26; }
+        .checkout-step.active .step-circle { border: 2px solid #302a26; color: #302a26; }
+        .checkout-step.current .step-circle { background: #302a26; color: #fff; border-color: #302a26; }
+        .checkout-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(340px, .9fr); gap: 70px; align-items: start; }
+        .section-number { font-size: 12px; letter-spacing: 2px; color: #8b6b4c; margin: 0 0 8px; }
+        h1, h2 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 400; }
+        .checkout-title { font-size: 34px; margin: 0 0 22px; }
+        .checkout-section { margin-bottom: 30px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+        .field { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+        .field.full { grid-column: 1 / -1; }
+        .field label { font-size: 11px; letter-spacing: 1.7px; }
+        .field input, .field select, .field textarea { width: 100%; min-height: 51px; border: 1px solid #e0d4c7; border-radius: 0; background: transparent; padding: 13px 15px; font: 14px Montserrat, Arial, sans-serif; color: #302a26; }
+        .field textarea { min-height: 85px; resize: vertical; }
+        .field input:focus, .field select:focus, .field textarea:focus { outline: 1px solid #8c7461; outline-offset: 1px; }
+        .helper { margin: -2px 0 0; color: #786d63; font-size: 12px; line-height: 1.6; }
+        .newsletter { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.5; margin: 20px 0 30px; }
+        .newsletter input { margin-top: 3px; }
+        .order-panel { border: 1px solid #e0d4c7; padding: 38px 36px; }
+        .order-eyebrow { font-size: 11px; letter-spacing: 2px; color: #8b6b4c; margin: 0 0 10px; }
+        .order-panel h2 { font-size: 32px; margin: 0 0 28px; }
+        .order-item { display: grid; grid-template-columns: 75px minmax(0, 1fr) auto; gap: 15px; align-items: start; padding: 0 0 22px; border-bottom: 1px solid #e0d4c7; margin-bottom: 24px; }
+        .order-item img { width: 75px; height: 78px; object-fit: cover; background: #f0e7dc; }
+        .order-item-name { font: 400 18px "Cormorant Garamond", Georgia, serif; margin: 0 0 4px; }
+        .order-item-meta { color: #786d63; font-size: 12px; line-height: 1.6; margin: 0 0 9px; }
+        .quantity-controls { display: inline-flex; align-items: center; border: 1px solid #e0d4c7; }
+        .quantity-controls button { border: 0; background: transparent; padding: 7px 11px; cursor: pointer; color: #302a26; }
+        .quantity-controls span { min-width: 24px; text-align: center; font-size: 12px; }
+        .promo-label { display: block; font-size: 11px; letter-spacing: 1.7px; margin-bottom: 10px; }
+        .promo-row { display: flex; margin-bottom: 28px; }
+        .promo-row input { flex: 1; min-width: 0; padding: 13px; border: 1px solid #e0d4c7; background: transparent; font: 13px Montserrat, Arial, sans-serif; }
+        .promo-row button { border: 0; background: #9c958e; color: white; padding: 0 15px; font-size: 10px; letter-spacing: 1px; cursor: pointer; }
+        .totals-row { display: flex; justify-content: space-between; gap: 20px; padding: 8px 0; font-size: 14px; }
+        .totals-row.total { border-top: 1px solid #e0d4c7; margin-top: 8px; padding-top: 17px; font-size: 18px; }
+        .delivery-note { font-size: 12px; color: #786d63; line-height: 1.6; margin: 12px 0 0; }
+        .place-order { width: 100%; margin-top: 26px; padding: 16px 12px; background: #302a26; color: #fff; border: 0; letter-spacing: 1.5px; font-size: 11px; cursor: pointer; }
+        .form-message { font-size: 13px; line-height: 1.6; margin-top: 14px; }
+        .back-link { display: inline-block; margin-bottom: 24px; color: #49372d; font-size: 12px; }
+        @media(max-width: 800px) {
+            .checkout-wrap { padding: 22px 18px 55px; }
+            .checkout-steps { margin-bottom: 45px; }
+            .checkout-step { font-size: 9px; letter-spacing: 1px; }
+            .step-circle { width: 43px; height: 43px; margin-bottom: 8px; }
+            .checkout-step:not(:last-child)::after { top: 21px; }
+            .checkout-layout { grid-template-columns: 1fr; gap: 35px; }
+            .order-panel { padding: 27px 22px; }
+            .checkout-title { font-size: 30px; }
+        }
+        @media(max-width: 480px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .field.full { grid-column: auto; }
+            .order-item { grid-template-columns: 62px minmax(0, 1fr) auto; gap: 10px; }
+            .order-item img { width: 62px; height: 68px; }
+            .order-panel { padding: 23px 16px; }
+        }
+    </style>
+</head>
+<body>
+<main class="checkout-wrap">
+    <a class="back-link" href="cart.html">← BACK TO BAG</a>
+
+    <div class="checkout-steps" aria-label="Checkout progress">
+        <div class="checkout-step active"><div class="step-circle">✓</div>CART</div>
+        <div class="checkout-step active current"><div class="step-circle">2</div>INFORMATION</div>
+        <div class="checkout-step"><div class="step-circle">3</div>PAYMENT</div>
+        <div class="checkout-step"><div class="step-circle">4</div>CONFIRMATION</div>
+    </div>
+
+    <div class="checkout-layout">
+        <form id="checkoutForm">
+            <section class="checkout-section">
+                <p class="section-number">01</p>
+                <h1 class="checkout-title">Contact.</h1>
+                <div class="form-grid">
+                    <div class="field full">
+                        <label for="email">EMAIL ADDRESS</label>
+                        <input id="email" name="email" type="email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="field full">
+                        <label for="phone">PHONE / WHATSAPP (optional)</label>
+                        <input id="phone" name="phone" type="tel" placeholder="082 123 4567">
+                        <p class="helper">So we can reach you about delivery.</p>
+                    </div>
+                </div>
+                <label class="newsletter"><input type="checkbox" name="newsletter"> <span>Email me about new arrivals and atelier notes</span></label>
+            </section>
+
+            <section class="checkout-section">
+                <p class="section-number">02</p>
+                <h2 class="checkout-title">Delivery address.</h2>
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="firstName">FIRST NAME</label>
+                        <input id="firstName" name="firstName" autocomplete="given-name" required>
+                    </div>
+                    <div class="field">
+                        <label for="lastName">LAST NAME</label>
+                        <input id="lastName" name="lastName" autocomplete="family-name" required>
+                    </div>
+                    <div class="field full">
+                        <label for="street">STREET ADDRESS</label>
+                        <input id="street" name="street" autocomplete="street-address" required>
+                    </div>
+                    <div class="field full">
+                        <label for="suburb">SUBURB / COMPLEX (optional)</label>
+                        <input id="suburb" name="suburb">
+                    </div>
+                    <div class="field">
+                        <label for="city">CITY</label>
+                        <input id="city" name="city" autocomplete="address-level2" required>
+                    </div>
+                    <div class="field">
+                        <label for="province">PROVINCE</label>
+                        <select id="province" name="province" required>
+                            <option value="">Select a province</option>
+                            <option>Eastern Cape</option><option>Free State</option><option>Gauteng</option>
+                            <option>KwaZulu-Natal</option><option>Limpopo</option><option>Mpumalanga</option>
+                            <option>North West</option><option>Northern Cape</option><option>Western Cape</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="postalCode">POSTAL CODE</label>
+                        <input id="postalCode" name="postalCode" inputmode="numeric" autocomplete="postal-code" required>
+                    </div>
+                    <div class="field full">
+                        <label for="notes">DELIVERY NOTES (optional)</label>
+                        <textarea id="notes" name="notes" placeholder="Gate code, directions, or other delivery details"></textarea>
+                    </div>
+                </div>
+            </section>
+        </form>
+
+        <aside class="order-panel">
+            <p class="order-eyebrow" id="orderCount">YOUR ORDER</p>
+            <h2>Order summary</h2>
+            <div id="orderItems"></div>
+
+            <label class="promo-label" for="promoCode">PROMO CODE</label>
+            <div class="promo-row">
+                <input id="promoCode" placeholder="Promo code">
+                <button type="button" id="applyPromo">APPLY →</button>
+            </div>
+            <p class="form-message" id="promoMessage" role="status"></p>
+
+            <div class="totals-row"><span>Subtotal</span><span id="subtotal">R 0</span></div>
+            <div class="totals-row"><span>Shipping</span><span id="shipping">R 0</span></div>
+            <div class="totals-row total"><strong>Total</strong><strong id="total">R 0</strong></div>
+            <p class="delivery-note" id="deliveryNote">Delivery is estimated based on your order subtotal. Confirm final delivery arrangements before payment.</p>
+            <button class="place-order" type="submit" form="checkoutForm">CONTINUE TO PAYMENT →</button>
+            <p class="form-message" id="checkoutMessage" role="status"></p>
+        </aside>
+    </div>
+</main>
+
+<script>
+(function () {
+    const FREE_DELIVERY_THRESHOLD = 550;
+    const STANDARD_DELIVERY = 60;
+    let promoApplied = false;
+
+    function getCart() {
+        try { return JSON.parse(localStorage.getItem("avelisseCart") || "[]"); }
+        catch (error) { return []; }
+    }
+
+    function money(value) {
+        return "R " + Number(value || 0).toFixed(2).replace(".00", "");
+    }
+
+    function calculateSubtotal(cart) {
+        return cart.reduce(function (sum, item) {
+            return sum + (Number(item.price) || 0) * (Number(item.quantity) || 0);
+        }, 0);
+    }
+
+    function renderOrder() {
+        const cart = getCart();
+        const itemsContainer = document.getElementById("orderItems");
+        itemsContainer.innerHTML = "";
+
+        const itemCount = cart.reduce(function (sum, item) {
+            return sum + (Number(item.quantity) || 0);
+        }, 0);
+        document.getElementById("orderCount").textContent =
+            "YOUR ORDER - " + itemCount + (itemCount === 1 ? " ITEM" : " ITEMS");
+
+        cart.forEach(function (item, index) {
+            const row = document.createElement("div");
+            row.className = "order-item";
+
+            const image = document.createElement("img");
+            image.src = item.image || "";
+            image.alt = item.name || "Candle";
+
+            const info = document.createElement("div");
+            const name = document.createElement("p");
+            name.className = "order-item-name";
+            name.textContent = item.name || "Candle";
+
+            const meta = document.createElement("p");
+            meta.className = "order-item-meta";
+            meta.textContent = [item.size, item.colour, item.scent].filter(Boolean).join(" · ") || "Handmade candle";
+
+            const controls = document.createElement("div");
+            controls.className = "quantity-controls";
+            const minus = document.createElement("button");
+            minus.type = "button";
+            minus.textContent = "−";
+            minus.setAttribute("aria-label", "Decrease quantity");
+            minus.addEventListener("click", function () {
+                const cartNow = getCart();
+                cartNow[index].quantity = (Number(cartNow[index].quantity) || 1) - 1;
+                if (cartNow[index].quantity <= 0) cartNow.splice(index, 1);
+                localStorage.setItem("avelisseCart", JSON.stringify(cartNow));
+                renderOrder();
+            });
+            const quantity = document.createElement("span");
+            quantity.textContent = Number(item.quantity) || 1;
+            const plus = document.createElement("button");
+            plus.type = "button";
+            plus.textContent = "+";
+            plus.setAttribute("aria-label", "Increase quantity");
+            plus.addEventListener("click", function () {
+                const cartNow = getCart();
+                cartNow[index].quantity = (Number(cartNow[index].quantity) || 1) + 1;
+                localStorage.setItem("avelisseCart", JSON.stringify(cartNow));
+                renderOrder();
+            });
+
+            controls.append(minus, quantity, plus);
+            info.append(name, meta, controls);
+
+            const price = document.createElement("span");
+            price.textContent = money((Number(item.price) || 0) * (Number(item.quantity) || 1));
+
+            row.append(image, info, price);
+            itemsContainer.appendChild(row);
+        });
+
+        updateTotals();
+        if (cart.length === 0) {
+            itemsContainer.innerHTML = '<p>Your bag is empty. <a href="candles.html">Explore candles →</a></p>';
+            document.querySelector(".place-order").disabled = true;
+        } else {
+            document.querySelector(".place-order").disabled = false;
+        }
+    }
+
+    function updateTotals() {
+        const cart = getCart();
+        const subtotal = calculateSubtotal(cart);
+        const shipping = subtotal >= FREE_DELIVERY_THRESHOLD || subtotal === 0 ? 0 : STANDARD_DELIVERY;
+        const discount = promoApplied ? 0 : 0;
+        document.getElementById("subtotal").textContent = money(subtotal);
+        document.getElementById("shipping").textContent = shipping === 0 && subtotal >= FREE_DELIVERY_THRESHOLD ? "FREE" : money(shipping);
+        document.getElementById("total").textContent = money(subtotal + shipping - discount);
+
+        const remaining = FREE_DELIVERY_THRESHOLD - subtotal;
+        document.getElementById("deliveryNote").textContent =
+            subtotal >= FREE_DELIVERY_THRESHOLD
+                ? "Your order qualifies for free delivery."
+                : "Add " + money(remaining) + " more for free delivery. Delivery amount is an estimate.";
+    }
+
+    document.getElementById("applyPromo").addEventListener("click", function () {
+        const code = document.getElementById("promoCode").value.trim();
+        document.getElementById("promoMessage").textContent = code
+            ? "This promo code cannot be validated yet. Promotional codes are not connected."
+            : "Please enter a promo code.";
+    });
+
+    document.getElementById("checkoutForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!getCart().length) {
+            document.getElementById("checkoutMessage").textContent = "Your bag is empty. Add a candle before continuing.";
+            return;
+        }
+        if (!this.reportValidity()) return;
+        document.getElementById("checkoutMessage").textContent =
+            "Your information is complete. Online payment is not connected yet, so no order or payment has been submitted. Next we can connect your preferred payment and order-confirmation method.";
+        document.getElementById("checkoutMessage").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+
+    renderOrder();
+})();
+</script>
+</body>
+</html>
